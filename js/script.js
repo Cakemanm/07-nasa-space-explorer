@@ -77,6 +77,34 @@ async function fetchSpaceImages(startDate, endDate) {
   return entries;
 }
 
+function buildVideoElement(entry, { large } = { large: false }) {
+  const url = entry.url;
+  const isDirectFile = /\.(mp4|mov|webm|ogg)(\?.*)?$/i.test(url);
+
+  // direct file video
+  if (isDirectFile) {
+    return `<video controls ${large ? '' : 'muted'} playsinline
+              style="width:100%; border-radius:6px; ${large ? '' : 'height:200px; object-fit:cover;'}">
+              <source src="${url}" />
+              Your browser doesn't support embedded video.
+              <a href="${url}" target="_blank" rel="noopener">Watch it here</a>.
+            </video>`;
+  }
+
+  // embeddable page / youtube
+  if (large) {
+    return `<div class="modal-video">
+               <iframe src="${url}" title="${entry.title}" frameborder="0"
+                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                 allowfullscreen></iframe>
+             </div>`;
+  }
+  return `<div class="video-thumb">
+            <div class="video-icon">▶</div>
+            <p class="video-label">Video: click to watch</p>
+          </div>`;
+}
+
 function createGalleryItem(entry) {
   const item = document.createElement('div');
   item.classList.add('gallery-item');
@@ -84,10 +112,7 @@ function createGalleryItem(entry) {
   if (entry.media_type === 'video') {
     // levelup: handle video entries
     item.innerHTML = `
-      <div class="video-thumb">
-        <div class="video-icon">▶</div>
-        <p class="video-label">Video: click to watch</p>
-      </div>
+      ${buildVideoElement(entry, { large: false })}
       <h3>${entry.title}</h3>
       <p>${entry.date}</p>
     `;
