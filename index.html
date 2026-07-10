@@ -19,11 +19,24 @@
       <button>Get Space Images</button>
     </div>
 
+    <!-- levelup: random fact-->
+    <div class="space-fact">
+      <span class="space-fact-label">🌌 Did You Know?</span>
+      <span id="factText"></span>
+    </div>
+
     <div id="gallery" class="gallery">
       <div class="placeholder">
         <div class="placeholder-icon">🔭</div>
         <p>Select a date range and click "Get Space Images" to explore the cosmos!</p>
       </div>
+    </div>
+  </div>
+
+  <div id="modal" class="modal">
+    <div class="modal-inner">
+      <button id="modalClose" class="modal-close" aria-label="Close">&times;</button>
+      <div id="modalContent" class="modal-content"></div>
     </div>
   </div>
 
