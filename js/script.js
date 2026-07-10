@@ -92,11 +92,9 @@ function createVideoNode(entry, { large }) {
     video.style.height = '200px';
     video.style.objectFit = 'cover';
   }
-  video.src = entry.url; // set directly on the element, not via a child <source>
-  video.load(); // force the browser to pick up the new source
+  video.src = entry.url; 
+  video.load(); 
 
-  // Prevent clicks on the video's own controls from bubbling up and
-  // re-triggering the card's "open modal" click handler.
   video.addEventListener('click', (e) => e.stopPropagation());
 
   return video;
@@ -128,8 +126,8 @@ function createGalleryItem(entry) {
   item.classList.add('gallery-item');
 
   if (entry.media_type === 'video') {
-    // LevelUp: handle video entries — direct video files get an inline preview,
-    // embeddable links (YouTube/Vimeo) get a click-to-watch thumbnail.
+    // levelup handle video entries
+    // embeddable links get a click to watch thumbnail
     const mediaNode = isDirectVideoFile(entry.url)
       ? createVideoNode(entry, { large: false })
       : createVideoThumbNode();
