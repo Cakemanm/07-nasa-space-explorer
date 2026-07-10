@@ -77,32 +77,50 @@ async function fetchSpaceImages(startDate, endDate) {
   return entries;
 }
 
-function buildVideoElement(entry, { large } = { large: false }) {
-  const url = entry.url;
-  const isDirectFile = /\.(mp4|mov|webm|ogg)(\?.*)?$/i.test(url);
+function isDirectVideoFile(url) {
+  return /\.(mp4|mov|webm|ogg)(\?.*)?$/i.test(url);
+}
 
-  // direct file video
-  if (isDirectFile) {
-    return `<video controls ${large ? '' : 'muted'} playsinline
-              style="width:100%; border-radius:6px; ${large ? '' : 'height:200px; object-fit:cover;'}">
-              <source src="${url}" />
-              Your browser doesn't support embedded video.
-              <a href="${url}" target="_blank" rel="noopener">Watch it here</a>.
-            </video>`;
+function createVideoNode(entry, { large }) {
+  const video = document.createElement('video');
+  video.controls = true;
+  video.playsInline = true;
+  if (!large) video.muted = true;
+  video.style.width = '100%';
+  video.style.borderRadius = '6px';
+  if (!large) {
+    video.style.height = '200px';
+    video.style.objectFit = 'cover';
   }
+  video.src = entry.url; // set directly on the element, not via a child <source>
+  video.load(); // force the browser to pick up the new source
 
-  // embeddable page / youtube
-  if (large) {
-    return `<div class="modal-video">
-               <iframe src="${url}" title="${entry.title}" frameborder="0"
-                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                 allowfullscreen></iframe>
-             </div>`;
-  }
-  return `<div class="video-thumb">
-            <div class="video-icon">▶</div>
-            <p class="video-label">Video: click to watch</p>
-          </div>`;
+  // Prevent clicks on the video's own controls from bubbling up and
+  // re-triggering the card's "open modal" click handler.
+  video.addEventListener('click', (e) => e.stopPropagation());
+
+  return video;
+}
+
+function createVideoThumbNode() {
+  const div = document.createElement('div');
+  div.className = 'video-thumb';
+  div.innerHTML = `
+    <div class="video-icon">▶</div>
+    <p class="video-label">Video: click to watch</p>
+  `;
+  return div;
+}
+
+function createVideoIframeNode(entry) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'modal-video';
+  wrapper.innerHTML = `
+    <iframe src="${entry.url}" title="${entry.title}" frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen></iframe>
+  `;
+  return wrapper;
 }
 
 function createGalleryItem(entry) {
@@ -110,12 +128,21 @@ function createGalleryItem(entry) {
   item.classList.add('gallery-item');
 
   if (entry.media_type === 'video') {
-    // levelup: handle video entries
-    item.innerHTML = `
-      ${buildVideoElement(entry, { large: false })}
-      <h3>${entry.title}</h3>
-      <p>${entry.date}</p>
-    `;
+    // LevelUp: handle video entries — direct video files get an inline preview,
+    // embeddable links (YouTube/Vimeo) get a click-to-watch thumbnail.
+    const mediaNode = isDirectVideoFile(entry.url)
+      ? createVideoNode(entry, { large: false })
+      : createVideoThumbNode();
+
+    item.appendChild(mediaNode);
+
+    const title = document.createElement('h3');
+    title.textContent = entry.title;
+    const date = document.createElement('p');
+    date.textContent = entry.date;
+    item.appendChild(title);
+    item.appendChild(date);
+
     item.addEventListener('click', () => openModal(entry));
   } else {
     item.innerHTML = `
