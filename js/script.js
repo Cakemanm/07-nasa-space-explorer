@@ -13,7 +13,7 @@ const gallery = document.getElementById('gallery');
 const factText = document.getElementById('factText');
 
 // api
-const API_KEY = 'myg0YjfgYfRF0ZA2Qeezw0ofGInj80iOJc4Qmc8o';
+const API_KEY = 'mygOYjfgYfRF0ZA2Qeezw0ofGInj80iOJc4Qmc8o';
 const APOD_URL = 'https://api.nasa.gov/planetary/apod';
 
 // levelup: random fact
