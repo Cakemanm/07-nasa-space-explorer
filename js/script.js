@@ -126,7 +126,7 @@ function createGalleryItem(entry) {
   item.classList.add('gallery-item');
 
   if (entry.media_type === 'video') {
-    // levelup handle video entries
+    //levelup handle video entries
     // embeddable links get a click to watch thumbnail
     const mediaNode = isDirectVideoFile(entry.url)
       ? createVideoNode(entry, { large: false })
